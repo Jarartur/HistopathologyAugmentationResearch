@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["libhaa"]
+
+[project]
+name = "libhaa"
+authors = [
+    {name = "Artur Jurgas", email = "arjurgas@outlook.com"},
+]
+version = "0.0.1"
+description = "Package for WSI augmentation with artifacts."
+readme = "README.md"
+requires-python = ">=3.10"
+keywords = ["histopathology", "image-augmentation"]
+license = {text = "Under review"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "pyvips",
+    "Pillow",
+    "numpy",
+    "opencv-python",
+    "scipy",
+    "staintools",
+]
+
+[project.optional-dependencies]
+HISTSEG = [
+    'torchio',
+    #...
+]
+CLASS = [
+    'pytorch_lightning',
+    'pandas',
+    'torchmetrics',
+    'palettable',
+    'mpltex',
+    #...
+]
+
+[project.scripts]

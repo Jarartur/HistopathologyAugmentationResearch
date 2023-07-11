@@ -1,0 +1,24 @@
+data: 
+  train_path: data/segmentation/input/train
+  val_path: data/segmentation/input/val
+  checkpoint_path: data/segmentation/models
+  patch_size: [256, 256, 1]
+  batch_size: 256
+  max_samples_per_volume: 1000 #50000 if quadratic 1000 if linear
+  samples_downsampling_mode: none
+  max_length: 15000
+  num_workers: 4
+  levels_to_skip: [0, 6, 7]
+  resume_path: None
+  load_scheduler: False
+model:
+  epochs: 1501
+  device: cuda
+  checkpoint_every: 10
+optimizer:
+  lr: 0.000001
+logging:
+  plot_every: 10
+  val_every: 50
+notes:
+  scheduler: None
