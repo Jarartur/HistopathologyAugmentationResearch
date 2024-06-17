@@ -1,6 +1,4 @@
-This repository contains the library used in the master thesis "Deep learning algorithms for quality assessment of whole slide images".
-
-Contained it the base library for augmentation as of publication.
+Contained is the base library for augmentation as of publication.
 
 Additionally code for the classification module and segmentation is included.
 
@@ -11,3 +9,4 @@ pip install -e .
 ```
 
 For segmentation inference we provide the weights in the `Releases` github panel.
+Classification weights will be made available soon.
