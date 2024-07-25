@@ -20,13 +20,17 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 dependencies = [
-    "pyvips",
     "Pillow",
-    "numpy",
+    "numpy < 2.0",
     "opencv-python",
     "scipy",
     "staintools",
+    "spams-bin",
+    "ruamel.yaml"
+    #pyvips,
+    #openslide-python,
 ]
+
 
 [project.optional-dependencies]
 HISTSEG = [
