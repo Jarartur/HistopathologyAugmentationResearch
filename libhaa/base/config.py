@@ -1,5 +1,11 @@
 from typing import Callable, Dict, Literal, TypeAlias
 from libhaa.base.blending import cvClone, do_nothing, blend_output_dst, focus_distortion, hard_clone, reinhard_staining
+
+from sys import platform
+if platform == "win32":
+    import os
+    vipsbin = r'c:\ProgramData\libvips\bin'
+    os.environ['PATH'] = os.pathsep.join((vipsbin, os.environ['PATH']))
 import pyvips
 
 # -- Base -- #

@@ -6,9 +6,13 @@ import numpy as np
 import cv2
 from torch.utils.data import DataLoader
 
-import os
-with os.add_dll_directory(r"C:\ProgramData\openslide\bin"):
+from sys import platform
+if platform == "linux" or platform == "linux2":
     from openslide import open_slide
+elif platform == "win32":
+    import os
+    with os.add_dll_directory(r"C:\ProgramData\openslide\bin"):
+        from openslide import open_slide
 
 # %% Setup
 LEVEL = 1

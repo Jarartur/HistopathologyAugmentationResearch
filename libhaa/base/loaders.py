@@ -10,11 +10,17 @@ from typing import Annotated, Callable, Generator, List, Optional, Tuple
 import warnings
 from PIL import Image as PILimage
 from PIL import ImageDraw
-import pyvips
 import numpy as np
 import xml.etree.ElementTree as ET
 import math
 import cv2
+
+from sys import platform
+if platform == "win32":
+    import os
+    vipsbin = r'c:\ProgramData\libvips\bin'
+    os.environ['PATH'] = os.pathsep.join((vipsbin, os.environ['PATH']))
+import pyvips
 
 from libhaa.base.config import (
     ANNOTATION_GROUP_XML_NAME,

@@ -10,7 +10,7 @@ name = "libhaa"
 authors = [
     {name = "Artur Jurgas", email = "arjurgas@outlook.com"},
 ]
-version = "0.0.1"
+version = "0.0.2"
 description = "Package for WSI augmentation with artifacts."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -26,24 +26,31 @@ dependencies = [
     "scipy",
     "staintools",
     "spams-bin",
-    "ruamel.yaml"
-    #pyvips,
-    #openslide-python,
+    "ruamel.yaml",
+    # "pyvips-binary", # not working with openslideload
+    "pyvips",
+    "openslide-bin",
+    "openslide-python",
 ]
 
 
 [project.optional-dependencies]
-HISTSEG = [
-    'torchio',
-    #...
-]
-CLASS = [
-    'pytorch_lightning',
-    'pandas',
-    'torchmetrics',
-    'palettable',
-    'mpltex',
-    #...
+all = [
+    "libhaa[histo-seg]",
+    "libhaa[histo-class]",
 ]
 
-[project.scripts]
+histo-seg = [
+    "torch",
+    "torchio",
+    #...
+]
+histo-class = [
+    "torch",
+    "pytorch_lightning",
+    "pandas",
+    "torchmetrics",
+    "palettable",
+    "mpltex",
+    #...
+]

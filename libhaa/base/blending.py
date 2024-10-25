@@ -6,8 +6,6 @@ import cv2
 import numpy as np
 import staintools
 import scipy.ndimage as nd
-import pyvips
-import PIL.Image
 
 def do_nothing(artifact, wsi_patch, artifact_mask, **kwargs):
     assert artifact.shape[:-1] == wsi_patch.shape[:-1] == artifact_mask.shape, f"{artifact.shape=} {wsi_patch.shape=} {artifact_mask.shape=}"

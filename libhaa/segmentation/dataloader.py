@@ -1,7 +1,6 @@
 from collections import namedtuple
 from typing import List, Optional
 import numpy as np
-import pyvips
 import torch as tc
 import torchio as tio
 from pathlib import Path
@@ -10,6 +9,13 @@ from libhaa.base.loaders import AbsoluteCoordinate, Annotation, save_annotations
 import cv2
 from tqdm import tqdm
 import warnings
+
+from sys import platform
+if platform == "win32":
+    import os
+    vipsbin = r'c:\ProgramData\libvips\bin'
+    os.environ['PATH'] = os.pathsep.join((vipsbin, os.environ['PATH']))
+import pyvips
 
 from libhaa.base.config import (
     NUM_UNSQUEEZED_DIMS,
