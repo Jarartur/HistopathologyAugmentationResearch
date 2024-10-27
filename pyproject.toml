@@ -54,3 +54,10 @@ histo-class = [
     "mpltex",
     #...
 ]
+
+[project.scripts]
+build-collection = "libhaa.scripts.build_collection:cli"
+generate-dataset = "libhaa.scripts.generate_dataset:cli"
+segment = "libhaa.scripts.segment:cli"
+cut-patches-training = "libhaa.scripts.cut_patches:cli_cut_for_training"
+cut-patches-inference = "libhaa.scripts.cut_patches:cli_cut_for_inference"

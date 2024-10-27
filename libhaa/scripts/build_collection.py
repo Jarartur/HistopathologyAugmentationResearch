@@ -23,7 +23,7 @@ def main(
     ))
     for (wsi_path, annotations_path) in pbar:
         pbar.set_description(f"Processing {wsi_path.name}")
-        print(wsi_path)#HACK: delete later
+        # print(wsi_path)#HACK: delete later
 
         image = ImageWSI.from_file(path=wsi_path)
         annotations = AnnotationCollection.from_file(path=annotations_path)
@@ -79,3 +79,34 @@ def get_annotation_path(wsi: Path, wsi_root: Path, root_annotations: Path, relat
             return annotation
     else:
         raise ValueError(f"Annotation not found for {wsi} with extensions {ANNOTATION_EXTs}")
+
+
+def cli():
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="Build artifact collection", epilog="Artur Jurgas."
+    )
+    parser.add_argument("--wsi-path", type=Path, required=True, help="Path to WSIs.")
+    parser.add_argument(
+        "--annotations-path", type=Path, required=True, help="Path to annotations."
+    )
+    parser.add_argument(
+        "--save-path", type=Path, required=True, help="Path to save to."
+    )
+    parser.add_argument(
+        "--relative-paths",
+        action="store_true",
+        default=False,
+        help="""Get annotation path relative to the WSI being processed. 
+If false the annotation path will be `annotations-path/wsi-name`. 
+If true it will be `annotations-path/wsi-folder/wsi-name`""",
+    )
+    args = parser.parse_args()
+
+    main(
+        root_wsi=args.wsi_path,
+        root_annotations=args.annotations_path,
+        root_save=args.save_path,
+        relative_paths=args.relative_paths,
+    )

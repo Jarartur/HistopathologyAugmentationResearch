@@ -98,3 +98,48 @@ def wsi_iterator(
             annotation_path = None
 
         yield Case(wsi_path, segmentation_path, save_path, annotation_path)
+
+def cli():
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="Generate a dataset.", epilog="Artur Jurgas."
+    )
+    parser.add_argument("--wsi-path", type=Path, required=True, help="Path to WSIs.")
+    parser.add_argument(
+        "--segmentations-path", type=Path, required=True, help="Path to annotations."
+    )
+    parser.add_argument(
+        "--artifact-collection-path",
+        type=Path,
+        required=True,
+        help="Path to the previously extracted artifact collection.",
+    )
+    parser.add_argument(
+        "--save-path", type=Path, required=True, help="Path to save to."
+    )
+    parser.add_argument(
+        "--root-annotation",
+        type=Path,
+        required=False,
+        default=None,
+        help="""
+If specified, the annotation path will be `root-annotation/wsi-folder/wsi-name`.
+If not specified the dataset will not include annotations.""",
+    )
+    parser.add_argument(
+        "--skip-existing",
+        action="store_true",
+        default=False,
+        help="Skip already existing files. Usefull for re-runs or appending new cases.",
+    )
+    args = parser.parse_args()
+
+    main(
+        root_wsi=args.wsi_path,
+        root_segmentation=args.segmentations_path,
+        artifact_collection=args.artifact_collection_path,
+        save_root=args.save_path,
+        skip_existing=args.skip_existing,
+        root_annotation=args.root_annotation,
+    )
