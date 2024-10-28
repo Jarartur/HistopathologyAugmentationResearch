@@ -1,10 +1,9 @@
 import itertools
 from pathlib import Path
-from typing import Dict, Generator, Tuple, List
+from typing import Generator, Tuple, List
 
-from libhaa.base.io import AnnotationCollection, Artifact, ImageWSI, Annotation, AnnotatedWSI
+from libhaa.base.io import AnnotationCollection, Artifact, ImageWSI, AnnotatedWSI
 from libhaa.base.config import WSI_EXTs, ANNOTATION_EXTs
-from libhaa.base.parsing import match_ext2class
 import uuid
 
 from tqdm import tqdm

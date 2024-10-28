@@ -1,3 +1,6 @@
 libhaa.egg-info
 **/__pycache__
-data
+data/test_augmented
+data/test_collection
+**/*.tiff
+**/*.tar

@@ -6,7 +6,11 @@ from libhaa.segmentation.dataloader import SegmentationModule
 import itertools
 
 def main(
-    root_wsi: Path, model_weights_path: Path, save_root: Path, openslide_level: int = 3
+    root_wsi: Path,
+    model_weights_path: Path,
+    save_root: Path,
+    openslide_level: int = 3,
+    device: str = "cpu",
 ):
     '''
     openslide_level: int, default 3
@@ -14,7 +18,7 @@ def main(
         for ACROBAT: 3-4
         for BigPicture: 6-7
     '''
-    segmod = SegmentationModule(model_weights_path, False, device="cuda")
+    segmod = SegmentationModule(model_weights_path, False, device=device)
 
     for wsi_path, save_path in wsi_iterator(root_wsi=root_wsi, save_root=save_root):
         segmod.inference_wsi(wsi_path, openslide_level, save_path)
@@ -63,6 +67,13 @@ Recommended values for tested datasets:
     for ACROBAT: 3-4
     for BigPicture: 6-7
 """,
+    )
+    parser.add_argument(
+        "--device",
+        type=str,
+        choices=["cpu", "cuda"],
+        default="cpu",  # Default value if none is provided
+        help="Specify the device to use (cpu or cuda). Default is cpu.",
     )
 
     args = parser.parse_args()

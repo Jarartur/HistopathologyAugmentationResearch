@@ -9,13 +9,12 @@ import multiprocessing as mp
 
 from libhaa.base.io import (
     AnnotatedWSI,
-    ImageWSI,
-    AnnotationCollection,
     ArtifactsCollection,
 )
 from libhaa.base.config import ARTIFACT_LIBRARY_ANNOTATION_EXT, WSI_EXTs
-from libhaa.base.parsing import match_ext2class
 
+from sys import platform
+import gc
 
 def main(
     root_wsi: Path, root_segmentation: Path, artifact_collection: Path, save_root: Path, skip_existing: bool = True, root_annotation = None
@@ -35,9 +34,16 @@ def main(
             pbar.set_description(f"{case.wsi_path.name} already exists, skipping...")
             continue
 
-        proc = mp.Process(target=execute_then_release, args=(case, Artifacts))
-        proc.start()
-        proc.join()
+        if (
+            platform == "win32"
+        ):  # sorry windows users, I don't know how to make this work as Artifacts are not pickable.
+            execute_then_release(case, Artifacts)
+            del case
+            gc.collect()
+        else:
+            proc = mp.Process(target=execute_then_release, args=(case, Artifacts))
+            proc.start()
+            proc.join()
 
 
 def execute_then_release(case, Artifacts):

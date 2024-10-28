@@ -29,8 +29,9 @@ dependencies = [
     "ruamel.yaml",
     # "pyvips-binary", # not working with openslideload
     "pyvips",
-    "openslide-bin",
+    # "openslide-bin", # will work after openslide-python 1.4 will be released
     "openslide-python",
+    "tqdm"
 ]
 
 

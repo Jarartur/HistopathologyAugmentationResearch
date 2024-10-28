@@ -128,7 +128,7 @@ class SegmentationModule:
             patch_overlap,
         )
 
-        patch_loader = tc.utils.data.DataLoader(grid_sampler, batch_size=batch_size)
+        patch_loader = tio.SubjectsLoader(grid_sampler, batch_size=batch_size)
         aggregator = tio.inference.GridAggregator(grid_sampler)
 
         for patches_batch in tqdm(patch_loader, desc="WSI processing"):

@@ -23,13 +23,14 @@ Finally, the `libhaa` library is installable by running the following command:
 pip install -e .
 ```
 
-Additional options are available for installation, such as installing the library with the `classification` or `segmentation` modules. To do so, first install [PyTorch](https://pytorch.org/get-started/locally/) and then run the following command. You can choose to instal one of the following options:
+Additional options are available after installation, such as installing the library with the `classification` or `segmentation` modules. To do so, first make sure you have installed the base package, then install [PyTorch](https://pytorch.org/get-started/locally/) and then run the following command. You can choose to instal one of the following options:
 
 - both modules by running the command with the `all` options.
 - only one module with either `histo-seg` or `histo-class` option.
 
 ```bash
-# (e.g.) conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
+# (e.g.) conda install pytorch==2.2.2 torchvision==0.17.2 torchaudio==2.2.2 pytorch-cuda=12.1 -c pytorch -c nvidia
+# After this you can choose to install optional dependencies:
 pip install -e .[all] # or [histo-seg] or [histo-class]
 ```
 
@@ -60,7 +61,58 @@ generates patches of training data from the chosen pyramid level of images from 
 - `cut-patches-inference`:
 generates patches from a single WSI for inference of the classification model available in the [releases page](https://github.com/Jarartur/HistopathologyAugmentationResearch/releases/tag/classification).
 
-Run `command -h` to learn about their available arguments. More detailed step-by-step guide will come in the near future. A simplified classification inference script is currently being worked on.
+## Typical workflow
+
+To follow along download `test_image.tiff` from the releases page and replace the file `data/test_data/images/dataset_name/replace_with_test_image`.
+
+### Building a collection
+
+First to build our artifact collection we run
+```bash
+build-collection --wsi-path data\test_data\images --annotations-path data\test_data\annotations --save-path data\test_collection --relative-paths
+```
+
+- `--wsi-path` specifies our image directory.
+- `--annotations-path` specifies our annotation directories. Keep in mind that if we were to keep our annotations inside the image folder we can just supply the same path as to `--wsi-path`.
+- `--save-path` specifies where to save the collection.
+- `--relative-paths` tells our program to include the `dataset_name` folder when searching for annotations. If you had a folder structure where each of the image is inside a subfolder (like here) but the annotations are aggregated in a single folder then do not use this option.
+
+This will create an artifact library in `data\test_collection`. It will consist of folders of artifact types and in each folder there will be artifact images and their annotation.
+
+### Segmenting images
+
+Now before augmenting our images we also need to generate segmentations for our images, so the program will know where to place each artifact. To do so, first download the segmentation model weights and place them, e.g., in the `data/models` directory. *Do not extract the downloaded file.* Now we run:
+```bash
+segment --wsi-path data\test_data\images --model-weights data\models\weights_v11.07.2023.tar --save-path data\test_data\segmentations --openslide-level 4 --device 'cuda'
+```
+
+- `--wsi-path` specifies our image directory.
+- `--model-weights` specifies our weights path.
+- `--save-path` specifies the save folder. Any subfolders in `--wsi-path` will be propagated here.
+- `--openslide-level` specifies the pyramid level to load. Running `segment -h` will give you recommended values for datasets used in the study.
+- `--device` can be a cpu or cuda. You can also specify which GPU to use by, e.g., `cuda:2`.
+
+In our case this will create a folder `data\test_data\segmentations\dataset_name` with a `test_image.xml` file in it contianing the segmentation in ASAP format.
+
+### Augmenting a dataset
+
+Now we will augment our image with new artifacts.
+
+```bash
+generate-dataset --wsi-path data\test_data\images --segmentations-path data\test_data\segmentations --artifact-collection-path data\test_collection --save-path data\test_augmented --root-annotation data\test_data\annotations
+```
+
+- `--wsi-path` specifies our image directory.
+- `--segmentations-path` specifies our previously generated segmentations.
+- `--artifact-collection-path` specifies our previously generated artifact collection.
+- `--save-path` specifies the save folder.
+- `--root-annotation` (optional). With this argument you can supply already present annotations. The new, augmented annotations will be merged with the existing ones.
+
+This will generate a `data\test_augmented\dataset_name` folder containing our augmented image. You can inspect the before and after with [ASAP](https://computationalpathologygroup.github.io/ASAP/) software. Keep in mind not all already present artifacts in this particular image are annotated from the beginning as it is a simple example.
+
+### Classification
+
+This section is still under construction and will be available in the near future. All code required to run this step is in `model_training/classification` folder but a simplified script will be made for inference.
 
 # Citing
 
