@@ -204,37 +204,15 @@ def cli_cut_for_training():
 
 
 def cli_cut_for_inference():
-    parser = argparse.ArgumentParser(
-        description="Cut patches from the WSI for inference.",
-        epilog="Artur Jurgas.",
-    )
+    parser = argparse.ArgumentParser(description="Cut patches for inference")
+    parser.add_argument("--wsi-path", type=Path, required=True, help="Path to WSIs.")
     parser.add_argument(
-        "--wsi-path", type=Path, required=True, help="Path to WSI image (one)."
+        "--save-path", type=Path, required=True, help="Path to save to."
     )
-    parser.add_argument(
-        "--save-path",
-        type=Path,
-        required=True,
-        help="Path where to save the processed patches from the WSI.",
-    )
-    parser.add_argument(
-        "--patch-size",
-        type=List,
-        required=True,
-        help="List of ints. Size of the extracted patches.",
-    )
-    parser.add_argument(
-        "--openslide-level",
-        type=Path,
-        required=True,
-        help="Pyramid level from which to extract the patches.",
-    )
-
+    parser.add_argument("--patch-size", type=int, required=True, help="Patch size.")
+    parser.add_argument("--openslide-level", type=int, required=True, help="Level.")
     args = parser.parse_args()
 
-    cut_inference(
-        input_image=args.wsi_path,
-        save_dir=args.save_path,
-        patch_size=args.path_size,
-        openslide_level=args.openslide_level,
+    cut_patches_for_inference(
+        args.wsi_path, args.save_path, [args.patch_size] * 2, args.openslide_level
     )

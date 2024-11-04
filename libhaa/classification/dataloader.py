@@ -6,7 +6,9 @@ from torchvision.models import ResNet50_Weights
 
 import pandas as pd
 from PIL import Image
+import numpy as np
 
+from ast import literal_eval
 from typing import Tuple, Type, Any
 from pathlib import Path
 from tqdm import trange
@@ -14,10 +16,24 @@ from sys import platform
 
 if platform == "win32":
     import os
-
     vipsbin = r"c:\ProgramData\libvips\bin"
     os.environ["PATH"] = os.pathsep.join((vipsbin, os.environ["PATH"]))
 import pyvips
+
+
+def reconstruct_prediction_from_preds(input_folder: Path, threshold: float = 0.5):
+    csv = list(input_folder.glob("*.csv"))
+    if len(csv) > 1:
+        raise ValueError("Multiple csv files found in folder.")
+    elif len(csv) == 0:
+        raise ValueError("No csv file found in folder.")
+    else:
+        csv = csv[0]
+
+    df = pd.read_csv(csv, converters={"y": literal_eval, "y_hat": literal_eval})
+
+    df["y_hat"] = df["y_hat"].apply(lambda x: [threshold] + x)
+    df["class_hat"] = df["y_hat"].apply(np.argmax)
 
 
 def cut_patches_for_inference(
@@ -26,6 +42,9 @@ def cut_patches_for_inference(
     patch_size: Tuple[int, int],
     openslide_level: int = 2,
 ):
+    save_dir = save_dir / input_image.stem
+    save_dir.mkdir(parents=True, exist_ok=False)
+
     # img: pyvips.Image = pyvips.Image.new_from_file(str(input_image), access='sequential')
     img: pyvips.Image = pyvips.Image.openslideload(
         str(input_image), level=openslide_level
@@ -48,13 +67,14 @@ def cut_patches_for_inference(
 
     file_list = []
 
+    (save_dir / "patches").mkdir(parents=True, exist_ok=False)
     for i in trange(num_patches_x):
         for j in range(num_patches_y):
             patch = img2.crop(
                 i * patch_size[0], j * patch_size[1], patch_size[0], patch_size[1]
             )
-            file = str(save_dir / f"{input_image.stem}_{i}_{j}.png")
-            patch.write_to_file(file)
+            file = str(Path("patches") / f"{input_image.stem}_{i}_{j}.png")
+            patch.write_to_file(save_dir / file)
             file_list.append(file)
 
     with open(save_dir / f"{input_image.stem}_info.txt", "w") as f:
@@ -65,7 +85,7 @@ def cut_patches_for_inference(
         f.write(f"pad_x: {pad_x}\n")
         f.write(f"pad_y: {pad_y}\n")
 
-    with open(save_dir / ".." / f"{input_image.stem}_file_list.csv", "w") as f:
+    with open(save_dir / f"{input_image.stem}_file_list.csv", "w") as f:
         f.write("File,air,dust,tissue,ink,marker,focus\n")
         for file in file_list:
             f.write(f"{file},0,0,0,0,0,0\n")
@@ -76,10 +96,11 @@ def cut_patches_for_inference(
 class HAA_Dataset(Dataset):
     def __init__(self, root: str, transform: Type[Any]):
         super().__init__()
-        self.root = root
+        # self.root = root
         self.transform = transform
 
         self.data = pd.read_csv(root)
+        self.root = Path(root).parent
         self.targets = []
 
     def __len__(self):
@@ -87,12 +108,13 @@ class HAA_Dataset(Dataset):
 
     def __getitem__(self, idx):
         file_path, *labels = self.data.iloc[idx, :].to_list()
-        img = Image.open(file_path)
+        img = Image.open(self.root / file_path)
+        name = Path(file_path).stem
 
         img = self.transform(img)
         labels = torch.tensor(labels, dtype=torch.float32)
 
-        return img, labels
+        return img, labels, name
 
 
 class HAA_DataModule(LightningDataModule):
@@ -102,9 +124,9 @@ class HAA_DataModule(LightningDataModule):
         img_size: Tuple[int, int] = (224, 224),
         batch_size: int = 2,
         num_workers: int = 4,
-        train_data_csv: str = "data.csv",
-        val_data_csv: str = "data.csv",
-        test_data_csv: str = "data.csv",
+        train_data_csv: str | None = None,
+        val_data_csv: str | None = None,
+        test_data_csv: str | None = None,
     ):
         """
         Base Data Module
@@ -121,80 +143,15 @@ class HAA_DataModule(LightningDataModule):
         self.dataset = HAA_Dataset
         self.train_transform, self.test_transform = self.get_transforms()
 
-    def prepare_data(self) -> None:
-        data = pd.read_csv(self.hparams.train_data_csv)
-        num_samples = data.shape[0]
-        self.num_classes = len(labels)
-        self.num_step = num_samples // self.hparams.batch_size
-
-        self.class_quant = []
-        num_samples_nonempty = 0
-        for i in range(self.num_classes):
-            num = data.iloc[:, i + 1].sum()
-            self.class_quant += [num]
-            num_samples_nonempty += num
-        self.class_weights = [
-            1 - (quant / num_samples_nonempty) for quant in self.class_quant
-        ]
-
-        print("-" * 50)
-        print(
-            "* {} dataset class num: {}".format(
-                self.hparams.dataset_name, self.num_classes
-            )
-        )
-        print(
-            "* {} dataset class quantity: {}".format(
-                self.hparams.dataset_name, self.class_quant
-            )
-        )
-        print(
-            "* {} dataset class weights: {}".format(
-                self.hparams.dataset_name, self.class_weights
-            )
-        )
-        print("* {} dataset len: {}".format(self.hparams.dataset_name, num_samples))
-        print("-" * 50)
-
     def setup(self, stage: str = None):
-        if stage in (None, "fit"):
-            self.train_ds = self.dataset(
-                root=self.hparams.train_data_csv, transform=self.train_transform
-            )
-            self.valid_ds = self.dataset(
-                root=self.hparams.val_data_csv, transform=self.test_transform
-            )
-
-        elif stage in (None, "test", "predict"):
+        if stage in (None, "test", "predict"):
             self.test_ds = self.dataset(
                 root=self.hparams.test_data_csv, transform=self.test_transform
             )
-
-    def train_dataloader(self) -> TRAIN_DATALOADERS:
-        return DataLoader(
-            self.train_ds,
-            batch_size=self.hparams.batch_size,
-            shuffle=True,
-            num_workers=self.hparams.num_workers,
-        )
-
-    def val_dataloader(self) -> EVAL_DATALOADERS:
-        return DataLoader(
-            self.valid_ds,
-            batch_size=self.hparams.batch_size,
-            shuffle=False,
-            num_workers=self.hparams.num_workers,
-        )
+        else:
+            raise ValueError(f"Stage {stage} not recognized.")
 
     def test_dataloader(self) -> EVAL_DATALOADERS:
-        return DataLoader(
-            self.test_ds,
-            batch_size=self.hparams.batch_size,
-            shuffle=False,
-            num_workers=self.hparams.num_workers,
-        )
-
-    def predict_dataloader(self) -> EVAL_DATALOADERS:
         return DataLoader(
             self.test_ds,
             batch_size=self.hparams.batch_size,

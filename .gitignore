@@ -4,3 +4,6 @@ data/test_augmented
 data/test_collection
 **/*.tiff
 **/*.tar
+**/*.zip
+**/*.ckpt
+data/test_inference
