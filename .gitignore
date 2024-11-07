@@ -3,6 +3,7 @@ libhaa.egg-info
 data/test_augmented
 data/test_collection
 **/*.tiff
+**/*.svs
 **/*.tar
 **/*.zip
 **/*.ckpt

@@ -9,7 +9,18 @@ if platform == "win32":
 import pyvips
 
 # -- Base -- #
-WSI_EXTs = [".tiff", ".tif", ".mrxs"]
+WSI_EXTs = [
+    ".tiff",
+    ".tif",
+    ".mrxs",
+    ".svs",
+    ".scn",
+    ".ndpi",
+    ".vms",
+    ".vmu",
+    ".bif",
+    ".svslide",
+]
 ANNOTATION_EXTs = [".xml"]
 ARTIFACT_LIBRARY_ANNOTATION_EXT = ".xml"
 

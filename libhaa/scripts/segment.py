@@ -82,4 +82,5 @@ Recommended values for tested datasets:
         model_weights_path=args.model_weights,
         save_root=args.save_path,
         openslide_level=args.openslide_level,
+        device=args.device,
     )
