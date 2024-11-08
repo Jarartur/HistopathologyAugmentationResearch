@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import Callable, Dict, Literal, TypeAlias
 from libhaa.base.blending import cvClone, do_nothing, blend_output_dst, focus_distortion, hard_clone, reinhard_staining
 
@@ -23,6 +24,10 @@ WSI_EXTs = [
 ]
 ANNOTATION_EXTs = [".xml"]
 ARTIFACT_LIBRARY_ANNOTATION_EXT = ".xml"
+
+class AnnotationDataType(Enum):
+    PIXELS_LVL_0 = "pixels"
+    UNITS_LVL_0 = "units"
 
 IMAGE_DATA_TYPE: TypeAlias = pyvips.Image
 

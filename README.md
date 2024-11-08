@@ -61,6 +61,9 @@ generates patches of training data from the chosen pyramid level of images from 
 - `cut-patches-inference`:
 generates patches from a single WSI for inference of the classification model available in the [releases page](https://github.com/Jarartur/HistopathologyAugmentationResearch/releases/tag/classification).
 
+- `generate_mask_from_xml`:
+generates masks from xml annotations, saving them as Pyramid TIFFs. 
+
 ## Typical workflow
 
 To follow along download `test_image.tiff` from the releases page and replace the file `data/test_data/images/dataset_name/replace_with_test_image`.
@@ -93,6 +96,18 @@ segment --wsi-path data/test_data/images --model-weights data/models/weights_v11
 - `--device` can be a cpu or cuda. You can also specify which GPU to use by, e.g., `cuda:2`.
 
 In our case this will create a folder `data/test_data/segmentations/dataset_name` with a `test_image.xml` file in it contianing the segmentation in ASAP format.
+
+### Generating segmented masks from xml annotations files
+
+Sometimes we want to obtain segmented masks saved as Pyramid TIFFs. This step enables converting previusly generated xml annotation files to Pyramid TIFFs. You need to run:
+```bash
+python main.py --annotations_dir data/test_data/segmentations/dataset_name --images_dir data/test_data/images --output_dir data/test_data/masks --xml_data_type pixels
+```
+
+- `--annotations_dir` specifies our xml annotations directory.
+- `--images_dir` specifies our images directory.
+- `--output_dir` specifies our output directory for masks.
+- `--xml_data_type` specifies the unit of the given coordinates in the annotation files. Set it to `pixels` if you use annotations obtained with use of segment.py script. 
 
 ### Augmenting a dataset
 
