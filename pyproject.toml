@@ -10,7 +10,7 @@ name = "libhaa"
 authors = [
     {name = "Artur Jurgas", email = "arjurgas@outlook.com"},
 ]
-version = "0.0.2"
+version = "0.1.0"
 description = "Package for WSI augmentation with artifacts."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -63,3 +63,4 @@ segment = "libhaa.scripts.segment:cli"
 cut-patches-training = "libhaa.scripts.cut_patches:cli_cut_for_training"
 cut-patches-inference = "libhaa.scripts.cut_patches:cli_cut_for_inference"
 classify = "libhaa.scripts.classify:run_inference"
+xml-to-tiff = "libhaa.scripts.generate_mask_from_xml:cli"

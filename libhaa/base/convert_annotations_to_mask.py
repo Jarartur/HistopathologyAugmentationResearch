@@ -2,20 +2,16 @@ import tqdm
 from typing import Dict, List, Tuple
 from pathlib import Path
 
-from config import (
-    WSI_EXTs,
-    ANNOTATION_EXTs,
-    AnnotationDataType
-)
+from libhaa.base.config import WSI_EXTs, ANNOTATION_EXTs, AnnotationDataType
 
-from loading_utils import (
+from libhaa.base.loading_utils import (
     load_image,
     find_files_with_extension,
     map_images_to_annotations,
-    get_pixel_size_scalling_factor_in_um
+    get_pixel_size_scalling_factor_in_um,
 )
 
-from converting_utils import (
+from libhaa.base.converting_utils import (
     prepare_metadata,
     parse_annotation,
     create_array_from_coordinates,

@@ -101,7 +101,7 @@ In our case this will create a folder `data/test_data/segmentations/dataset_name
 
 Sometimes we want to obtain segmented masks saved as Pyramid TIFFs. This step enables converting previusly generated xml annotation files to Pyramid TIFFs. You need to run:
 ```bash
-python main.py --annotations_dir data/test_data/segmentations/dataset_name --images_dir data/test_data/images --output_dir data/test_data/masks --xml_data_type pixels
+xml-to-tiff --annotations_dir data/test_data/segmentations/dataset_name --images_dir data/test_data/images/dataset_name --output_dir data/test_data/masks --xml_data_type pixels
 ```
 
 - `--annotations_dir` specifies our xml annotations directory.
