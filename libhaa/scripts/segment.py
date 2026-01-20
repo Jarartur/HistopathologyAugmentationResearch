@@ -21,7 +21,11 @@ def main(
     segmod = SegmentationModule(model_weights_path, False, device=device)
 
     for wsi_path, save_path in wsi_iterator(root_wsi=root_wsi, save_root=save_root):
-        segmod.inference_wsi(wsi_path, openslide_level, save_path)
+        try:
+            segmod.inference_wsi(wsi_path, openslide_level, save_path)
+        except Exception as e:
+            print(f"\n\nSkipping processing for file '{wsi_path}' due to an error: {e}\n\n")
+            continue 
 
 def wsi_iterator(
     root_wsi: Path,
