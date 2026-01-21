@@ -109,7 +109,7 @@ def cli():
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Generate a dataset.", epilog="Artur Jurgas."
+        description="Generate a dataset.", epilog="If you find our work usefull, please cite: 10.1038/s41598-024-68667-2"
     )
     parser.add_argument("--wsi-path", type=Path, required=True, help="Path to WSIs.")
     parser.add_argument(

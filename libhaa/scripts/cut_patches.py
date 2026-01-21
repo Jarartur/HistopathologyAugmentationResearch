@@ -128,7 +128,7 @@ def wsi_iterator(
 def cli_cut_for_training():
     parser = argparse.ArgumentParser(
         description="Cut patches from the WSI for training.",
-        epilog="Artur Jurgas.",
+        epilog="If you find our work usefull, please cite: 10.1038/s41598-024-68667-2",
     )
     parser.add_argument("--wsi-path", type=Path, required=True, help="Path to WSIs.")
     parser.add_argument(
