@@ -2,6 +2,7 @@ from collections import namedtuple
 from typing import List, Optional
 import numpy as np
 import torch as tc
+from torch.utils.data import DataLoader
 import torchio as tio
 from pathlib import Path
 from libhaa.segmentation.model import load_network
@@ -128,7 +129,7 @@ class SegmentationModule:
             patch_overlap,
         )
 
-        patch_loader = tio.SubjectsLoader(grid_sampler, batch_size=batch_size)
+        patch_loader = DataLoader(grid_sampler, batch_size=batch_size)
         aggregator = tio.inference.GridAggregator(grid_sampler)
 
         for patches_batch in tqdm(patch_loader, desc="WSI processing"):
